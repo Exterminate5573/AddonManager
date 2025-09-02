@@ -1,0 +1,37 @@
+info:
+  name: "AddonManager"
+  identifier: "addonmanager"
+  description: "Manage Minecraft Plugins, Mods and more!"
+  flags: ""
+  version: "0.1"
+  target: "beta-2024-12"
+  author: "Exterminate"
+  icon: ""
+  website: ""
+
+admin:
+  view: "view.blade.php"
+  controller: ""
+  css: ""
+  wrapper: ""
+
+dashboard:
+  css: ""
+  wrapper: ""
+  components: "components"
+
+data:
+  directory: ""
+  public: ""
+  console: ""
+
+
+requests:
+  views: ""
+  app: "src"
+  routers:
+    application: "routes.php"
+
+
+database:
+  migrations: "migrations"
