@@ -2,5 +2,7 @@
   "name": "Blueprint Dev Container",
   "dockerComposeFile": ["docker-compose.yml"],
   "service": "panel",
-  "workspaceFolder": "/app"
+  "workspaceFolder": "/app/.blueprint/dev",
+  "envFile": ".env",
+  "postCreateCommand": "git checkout main"
 }
