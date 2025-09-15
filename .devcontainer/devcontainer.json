@@ -1,6 +1,6 @@
 {
   "name": "Blueprint Dev Container",
-  "dockerComposeFile": ["https://raw.githubusercontent.com/BlueprintFramework/docker/refs/heads/Master/docker-compose.yml"],
+  "dockerComposeFile": ["docker-compose.yml"],
   "service": "panel",
   "workspaceFolder": "/workspace"
 }
