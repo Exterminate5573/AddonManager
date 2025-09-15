@@ -2,5 +2,5 @@
   "name": "Blueprint Dev Container",
   "dockerComposeFile": ["docker-compose.yml"],
   "service": "panel",
-  "workspaceFolder": "/workspace"
+  "workspaceFolder": "/app"
 }
