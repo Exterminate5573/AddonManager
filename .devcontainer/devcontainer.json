@@ -4,5 +4,5 @@
   "service": "panel",
   "workspaceFolder": "/app/.blueprint/dev",
   "envFile": ".env",
-  "postCreateCommand": "git checkout main"
+  "postCreateCommand": "rm .gitkeep && git clone https://github.com/Exterminate5573/AddonManager.git ."
 }
