@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::update('installed_addons', function (Blueprint $table) {
+        Schema::table('installed_addons', function (Blueprint $table) {
             $table->string('friendly_name')->after('provider');
             $table->string('friendly_version')->after('friendly_name');
         });
