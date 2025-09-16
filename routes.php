@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Pterodactyl\BlueprintFramework\Extensions\mcmanager\AddonController;
+use Pterodactyl\BlueprintFramework\Extensions\{identifier}\AddonController;
 
 Route::prefix('/server/{server}')->group(function () {
     Route::get('/', [AddonController::class, 'index']);
