@@ -1,6 +1,6 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\mcmanager;
+namespace Pterodactyl\BlueprintFramework\Extensions\{identifier};
 
 use Illuminate\Support\Facades\Http;
 
