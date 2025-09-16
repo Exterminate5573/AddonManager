@@ -46,6 +46,16 @@ class AddonController extends Controller
         $providerName = $request->input('provider', 'spigot');
         $provider = $this->getProvider($providerName);
         $results = $provider->searchAddons($query, $page);
+
+        foreach ($results['items'] as &$item) {
+            //Query DB to see if installed
+            $installed = DB::table('installed_addons')
+                            ->where('provider', $item['provider'])
+                            ->where('uuid', $item['uuid'])->first();
+            $item['installed'] = $installed ? true : false;
+            $item['upToDate'] = $installed && $installed->version === $item['addonVersionId'];
+        }
+
         return response()->json($results);
     }
 
@@ -54,25 +64,23 @@ class AddonController extends Controller
     {
         $data = $request->validate([
             'uuid' => 'required|string',
-            'version' => 'required|string',
-            'provider' => 'required|string',
-            'resource_id' => 'required|string',
+            'provider' => 'required|string'
         ]);
 
         // Download file from provider
         $provider = $this->getProvider($data['provider']);
-        $fileContents = $provider->downloadAddon($data['resource_id']);
-        if (!$fileContents) {
+        $info = $provider->downloadAddon($data['uuid']);
+        if (!$info) {
             return response()->json(['success' => false, 'error' => 'Failed to download file'], 400);
         }
 
         // Store file using DaemonFileRepository
-        $fileName = $data['uuid'] . '-' . $data['version'] . '.jar';
+        $fileName = $info['friendlyName'] . '-' . $info['friendlyVersion'] . '.jar';
         $filePath = 'plugins/' . $fileName;
-        $this->fileRepository->setServer($server)->putContent($filePath, $fileContents);
+        $this->fileRepository->setServer($server)->putContent($filePath, $info['fileContents']);
 
         // Calculate file hash
-        $fileHash = hash('sha256', $fileContents);
+        $fileHash = hash('sha256', $info['fileContents']);
 
         // Save to DB
         DB::table('installed_addons')->updateOrInsert(
@@ -80,6 +88,8 @@ class AddonController extends Controller
             [
                 'version' => $data['version'],
                 'provider' => $data['provider'],
+                'friendly_name' => $info['friendlyName'] ?? $data['uuid'],
+                'friendly_version' => $info['friendlyVersion'] ?? $data['version'],
                 'file_hash' => $fileHash,
                 'file_path' => $filePath,
             ]
@@ -92,24 +102,36 @@ class AddonController extends Controller
     public function update(Request $request, Server $server, $uuid)
     {
         $data = $request->validate([
-            'version' => 'required|string',
-            'resource_id' => 'required|string',
             'provider' => 'required|string',
         ]);
 
-        $provider = $this->getProvider($data['provider']);
-        $fileContents = $provider->downloadAddon($data['resource_id']);
-        if (!$fileContents) {
+        $existing = DB::table('installed_addons')
+                        ->where('provider', $data['provider'])
+                        ->where('uuid', $uuid)->first();
+        if (!$existing) {
+            return response()->json(['success' => false, 'error' => 'Addon not found'], 404);
+        }
+
+        //Delete existing file
+        if (isset($existing->file_path)) {
+            $this->fileRepository->setServer($server)->delete($existing->file_path);
+        }
+
+        $provider = $this->getProvider($existing['provider']);
+        $info = $provider->downloadAddon($existing['resource_id']);
+        if (!$info) {
             return response()->json(['success' => false, 'error' => 'Failed to download file'], 400);
         }
 
-        $fileName = $uuid . '-' . $data['version'] . '.jar';
+        $fileName = $info['friendlyName'] . '-' . $info['friendlyVersion'] . '.jar';
         $filePath = 'plugins/' . $fileName;
-        $this->fileRepository->setServer($server)->putContent($filePath, $fileContents);
-        $fileHash = hash('sha256', $fileContents);
+        $this->fileRepository->setServer($server)->putContent($filePath, $info['fileContents']);
+        $fileHash = hash('sha256', $info['fileContents']);
 
         DB::table('installed_addons')->where('uuid', $uuid)->update([
             'version' => $data['version'],
+            'friendly_name' => $info['friendlyName'] ?? $data['uuid'],
+            'friendly_version' => $info['friendlyVersion'] ?? $data['version'],
             'file_hash' => $fileHash,
             'file_path' => $filePath,
         ]);
@@ -121,7 +143,7 @@ class AddonController extends Controller
     {
         $addon = DB::table('installed_addons')->where('uuid', $uuid)->first();
         if ($addon && isset($addon->file_path)) {
-            Storage::disk('local')->delete($addon->file_path);
+            $this->fileRepository->delete($addon->file_path);
         }
         DB::table('installed_addons')->where('uuid', $uuid)->delete();
         return response()->json(['success' => true]);

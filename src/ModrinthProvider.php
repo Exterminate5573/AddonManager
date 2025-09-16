@@ -74,7 +74,13 @@ class ModrinthProvider
 
             $response = Http::get($downloadUrl);
             if ($response->ok()) {
-                return $response->body();
+                return [
+                    'fileContents' => $response->body(),
+                    'friendlyName' => $latestVersion['name'] ?? $resourceId,
+                    'friendlyVersion' => $latestVersion['version_number'] ?? 'unknown',
+                ];
+            } else {
+                return null;
             }
         }
     }

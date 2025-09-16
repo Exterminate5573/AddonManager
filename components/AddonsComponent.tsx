@@ -88,8 +88,8 @@ const AddonsComponent = () => {
                   <AddonTile
                     key={addon.uuid}
                     {...addon}
-                    onDownload={() => installAddon(serverId, { uuid: addon.uuid, version: addon.addonVersionId, provider: selectedProvider.id, resource_id: addon.uuid })}
-                    onUpdate={() => updateAddon(serverId, addon.uuid, { version: addon.addonVersionId, resource_id: addon.uuid })}
+                    onDownload={() => installAddon(serverId, { uuid: addon.uuid, provider: addon.provider })}
+                    onUpdate={() => updateAddon(serverId, addon.uuid, addon.provider)}
                     onDelete={() => removeAddon(serverId, addon.uuid)}
                   />
                 );

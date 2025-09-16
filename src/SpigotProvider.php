@@ -54,7 +54,22 @@ class SpigotProvider
 
     public function downloadAddon($resourceId)
     {
-        $url = "https://api.spiget.org/v2/resources/{$resourceId}/download";
+        // This is necessary as Spiget does not provide all the needed info in one call
+        $resourceUrl = "https://api.spiget.org/v2/resources/{$resourceId}";
+        $resourceResponse = Http::get($resourceUrl);
+        if (!$resourceResponse->ok()) {
+            return null;
+        }
+        $resourceData = $resourceResponse->json();
+
+        $versionUrl = "https://api.spiget.org/v2/resources/{$resourceId}/version/latest";
+        $versionResponse = Http::get($versionUrl);
+        if (!$versionResponse->ok()) {
+            return null;
+        }
+        $versionData = $versionResponse->json();
+
+        $url = "https://api.spiget.org/v2/resources/{$resourceId}/versions/{$versionData['id']}/download";
         $response = Http::withOptions(['allow_redirects' => true])->get($url);
 
         if ($response->ok()) {
@@ -64,7 +79,11 @@ class SpigotProvider
                 return null;
             }
             // CDN file, return contents
-            return $response->body();
+            return [
+                'fileContents' => $response->body(),
+                'friendlyName' => $resourceData['name'] ?? $resourceId,
+                'friendlyVersion' => $versionData['name'] ?? 'unknown',
+            ];
         }
 
         // Handle 302 redirect manually if needed
@@ -75,7 +94,11 @@ class SpigotProvider
                 // Follow the redirect to the CDN
                 $cdnResponse = Http::get($location);
                 if ($cdnResponse->ok()) {
-                    return $cdnResponse->body();
+                    return [
+                        'fileContents' => $cdnResponse->body(),
+                        'friendlyName' => $resourceData['name'] ?? $resourceId,
+                        'friendlyVersion' => $versionData['name'] ?? 'unknown',
+                    ];
                 }
             }
             // Externally hosted, cannot download directly

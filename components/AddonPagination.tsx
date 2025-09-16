@@ -5,6 +5,7 @@ import { PaginatedResult } from '@/api/http';
 
 export type Addon = {
     uuid: string;
+    provider: string;
     addonName: string;
     addonDescription?: string;
     addonVersion?: string;
@@ -12,6 +13,7 @@ export type Addon = {
     addonAuthor?: string;
     iconURL?: string;
     installed?: boolean;
+    upToDate?: boolean;
 };
 
 
