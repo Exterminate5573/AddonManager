@@ -1,5 +1,6 @@
 
 // Secure API-based addon management
+const apiURL = "/api/application/extensions/{identifier}";
 
 export type InstalledAddon = {
     uuid: string;
@@ -12,13 +13,13 @@ export type InstalledAddon = {
 };
 
 export async function getAllInstalledAddons(serverUuid: string): Promise<InstalledAddon[]> {
-    const res = await fetch(`/api/application/extensions/mcmanager/server/${encodeURIComponent(serverUuid)}/`);
+    const res = await fetch(`${apiURL}/server/${encodeURIComponent(serverUuid)}/`);
     return await res.json();
 }
 
 // Search for addons using backend provider abstraction
 export async function searchAddons(serverUuid: string, query: string, page: number = 1, provider: string = 'spigot') {
-    const res = await fetch(`/api/application/extensions/mcmanager/server/${encodeURIComponent(serverUuid)}/search?query=${encodeURIComponent(query)}&page=${page}&provider=${encodeURIComponent(provider)}`);
+    const res = await fetch(`${apiURL}/server/${encodeURIComponent(serverUuid)}/search?query=${encodeURIComponent(query)}&page=${page}&provider=${encodeURIComponent(provider)}`);
     return await res.json();
 }
 
@@ -29,7 +30,7 @@ function getCsrfToken(): string {
 
 // Install an addon by resource_id (backend handles download)
 export async function installAddon(serverUuid: string, { uuid, provider }: { uuid: string, provider: string }) {
-    await fetch(`/api/application/extensions/mcmanager/server/${encodeURIComponent(serverUuid)}/`, {
+    await fetch(`${apiURL}/server/${encodeURIComponent(serverUuid)}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -41,7 +42,7 @@ export async function installAddon(serverUuid: string, { uuid, provider }: { uui
 
 // Update an addon (re-download)
 export async function updateAddon(serverUuid: string, uuid: string, provider: string) {
-    await fetch(`/api/application/extensions/mcmanager/server/${encodeURIComponent(serverUuid)}/${uuid}`, {
+    await fetch(`${apiURL}/server/${encodeURIComponent(serverUuid)}/${uuid}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -52,7 +53,7 @@ export async function updateAddon(serverUuid: string, uuid: string, provider: st
 }
 
 export async function removeAddon(serverUuid: string, uuid: string) {
-    await fetch(`/api/application/extensions/mcmanager/server/${encodeURIComponent(serverUuid)}/${uuid}`, {
+    await fetch(`${apiURL}/server/${encodeURIComponent(serverUuid)}/${uuid}`, {
         method: 'DELETE',
         headers: {
             'X-CSRF-TOKEN': getCsrfToken(),
