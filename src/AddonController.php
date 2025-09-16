@@ -1,14 +1,14 @@
 <?php
 
-namespace Pterodactyl\BlueprintFramework\Extensions\mcmanager;
+namespace Pterodactyl\BlueprintFramework\Extensions\{identifier};
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Pterodactyl\Http\Controllers\Controller;
-use Pterodactyl\BlueprintFramework\Extensions\mcmanager\SpigotProvider;
-use Pterodactyl\BlueprintFramework\Extensions\mcmanager\ModrinthProvider;
-use Pterodactyl\BlueprintFramework\Extensions\mcmanager\PaperMCProvider;
+use Pterodactyl\BlueprintFramework\Extensions\{identifier}\SpigotProvider;
+use Pterodactyl\BlueprintFramework\Extensions\{identifier}\ModrinthProvider;
+use Pterodactyl\BlueprintFramework\Extensions\{identifier}\PaperMCProvider;
 use Pterodactyl\BlueprintFramework\Libraries\ExtensionLibrary\Admin\BlueprintAdminLibrary as BlueprintExtensionLibrary;
 use Pterodactyl\Repositories\Wings\DaemonFileRepository;
 use Pterodactyl\Models\Server;
